@@ -156,10 +156,9 @@ function createSea() {
 }
 
 /**
- * [createSky 创建天空]
+ * [Cloud 创建云朵]
  * @return {[type]} [description]
  */
-
 var Cloud = function() {
 	// 创建一个天空的容器放置不同形状的云
 	this.mesh = new THREE.Object3D();
@@ -199,11 +198,54 @@ var Cloud = function() {
 }
 
 
+/**
+ * [createSky 创建天空]
+ * @return {[type]} [description]
+ */
+var Sky = function() {
+	// 创建一个空的容器
+	this.mesh = new THREE.Object3D();
+
+	// 选取若干云朵散布在天空中
+	this.nClouds = 20;
+
+	// 把云均匀地散布
+	// 我们需要根据统一的角度放置它们
+	var stepAngle = Math.PI*2 / this.nClouds;
+
+	// 创建云对象
+	for(var i=0;i<this.nClouds;i++){
+		var c = new Cloud();
+
+		// 设置每朵云的旋转角度和位置
+		//  因此我们使用了一点三角函数
+		var a = stepAngle*i;
+		var h = 750 + Math.random()*200;
+
+		c.mesh.position.y = Math.sin(a)*h;
+		c.mesh.position.x = Math.cos(a)*h;
+
+		// 根据云的位置旋转它
+		c.mesh.rotation.z = a + Math.PI/2;
+
+		// 为了有更好的效果，我们把云放置在场景中的随机深度位置
+		c.mesh.position.z = -100 - Math.random()*400;
+
+		// 而且我们为每朵云设置一个随机大小 1~3
+		var s = 1 + Math.random() * 2;
+		c.mesh.scale.set(s,s,s);
+
+		// 不要忘记将每朵云的网格添加到容器中
+		this.mesh.add(c.mesh);
+	}
+}
+
+
 var sky;
 
 function createSky() {
-	sky = new Cloud();
-	sky.mesh.position.y = 130;
+	sky = new Sky();
+	sky.mesh.position.y = -600;
 	scene.add(sky.mesh);
 }
 
