@@ -229,7 +229,7 @@ var Sky = function() {
 		c.mesh.rotation.z = a + Math.PI/2;
 
 		// 为了有更好的效果，我们把云放置在场景中的随机深度位置
-		c.mesh.position.z = -100 - Math.random()*400;
+		c.mesh.position.z = -400 - Math.random()*400;
 
 		// 而且我们为每朵云设置一个随机大小 1~3
 		var s = 1 + Math.random() * 2;
@@ -250,6 +250,110 @@ function createSky() {
 }
 
 
+var AirPlane = function() {
+	this.mesh = new THREE.Object3D();
+
+	// 创建机舱
+	var geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
+	var matCockpit = new THREE.MeshPhongMaterial({
+		color: Colors.red,
+		shading: THREE.FlatShading
+	});
+	var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
+	cockpit.castShadow = true;
+	cockpit.receiveShadow = true;
+	this.mesh.add(cockpit);
+
+	// 创建引擎
+	var geomEngine = new THREE.BoxGeometry(20, 50, 50, 1, 1, 1);
+	var matEngine = new THREE.MeshPhongMaterial({
+		color: Colors.white,
+		shading: THREE.FlatShading
+	});
+	var engine = new THREE.Mesh(geomEngine, matEngine);
+	engine.position.x = 40;
+	engine.castShadow = true;
+	engine.receiveShadow = true;
+	this.mesh.add(engine);
+
+	// 创建机尾
+	var geomTailPlane = new THREE.BoxGeometry(15, 20, 5, 1, 1, 1);
+	var matTailPlane = new THREE.MeshPhongMaterial({
+		color: Colors.red,
+		shading: THREE.FlatShading
+	});
+	var tailPlane = new THREE.Mesh(geomTailPlane, matTailPlane);
+	tailPlane.position.set(-35, 25, 0);
+	tailPlane.castShadow = true;
+	tailPlane.receiveShadow = true;
+	this.mesh.add(tailPlane);
+
+	// 创建机翼
+	var geomSideWing = new THREE.BoxGeometry(40, 8, 150, 1, 1, 1);
+	var matSideWing = new THREE.MeshPhongMaterial({
+		color: Colors.red,
+		shading: THREE.FlatShading
+	});
+	var sideWing = new THREE.Mesh(geomSideWing, matSideWing);
+	sideWing.castShadow = true;
+	sideWing.receiveShadow = true;
+	this.mesh.add(sideWing);
+
+	// 创建螺旋桨
+	var geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
+	var matPropeller = new THREE.MeshPhongMaterial({
+		color: Colors.brown,
+		shading: THREE.FlatShading
+	});
+	this.propeller = new THREE.Mesh(geomPropeller, matPropeller);
+	this.propeller.castShadow = true;
+	this.propeller.receiveShadow = true;
+
+	// 创建螺旋桨的桨叶
+	var geomBlade = new THREE.BoxGeometry(1, 100, 20, 1, 1, 1);
+	var matBlade = new THREE.MeshPhongMaterial({
+		color: Colors.brownDark,
+		shading: THREE.FlatShading
+	});
+
+	var blade = new THREE.Mesh(geomBlade, matBlade);
+	blade.position.set(8, 0, 0);
+	blade.castShadow = true;
+	blade.receiveShadow = true;
+	this.propeller.add(blade);
+	this.propeller.position.set(50, 0, 0);
+	this.mesh.add(this.propeller);
+}
+
+var airplane;
+
+function createPlane() {
+	airplane = new AirPlane();
+	airplane.mesh.scale.set(.25,.25,.25);
+	airplane.mesh.position.y = 100;
+	scene.add(airplane.mesh);
+}
+
+
+var mousePos={x:0, y:0};
+
+// mousemove 事件处理函数
+
+function handleMouseMove(event) {
+
+   // 这里我把接收到的鼠标位置的值转换成归一化值，在-1与1之间变化 
+   // 这是x轴的公式:
+
+   var tx = -1 + (event.clientX / WIDTH)*2;
+
+   // 对于 y 轴，我们需要一个逆公式
+   // 因为 2D 的 y 轴与 3D 的 y 轴方向相反
+
+   var ty = 1 - (event.clientY / HEIGHT)*2;
+   mousePos = {x:tx, y:ty};
+}
+
+
 
 /**
  * [init 初始化函数]
@@ -265,14 +369,47 @@ function init() {
 
 	createSky();
 
+	createPlane();
+
+	//添加鼠标移动监听器
+    document.addEventListener('mousemove', handleMouseMove, false);
+
 	loop();
 }
 
 
 function loop(){
 	sea.mesh.rotation.z += .005;
+	sky.mesh.rotation.z += .001;
+	// 更新每帧的飞机
+    updatePlane();
 	renderer.render(scene, camera);
 	requestAnimationFrame(loop);
 }
+
+function updatePlane(){
+
+   // 让我们在x轴上-100至100之间和y轴25至175之间移动飞机
+   // 根据鼠标的位置在-1与1之间的范围，我们使用的 normalize 函数实现（如下）
+
+   var targetX = normalize(mousePos.x, -1, 1, -100, 100);
+   var targetY = normalize(mousePos.y, -1, 1, 25, 175);
+
+   // 更新飞机的位置
+   airplane.mesh.position.y = targetY;
+   airplane.mesh.position.x = targetX;
+   airplane.propeller.rotation.x += 0.3;
+}
+
+function normalize(v,vmin,vmax,tmin, tmax){
+
+   var nv = Math.max(Math.min(v,vmax), vmin);
+   var dv = vmax-vmin;
+   var pc = (nv-vmin)/dv;
+   var dt = tmax-tmin;
+   var tv = tmin + (pc*dt);
+   return tv;
+}
+
 
 window.addEventListener('load', init, false);
