@@ -156,6 +156,40 @@ function createSea() {
 }
 
 
+var Box = function() {
+	var geom = new THREE.CylinderGeometry(600,600,800,40,10);
+
+	// 在 x 轴旋转几何体
+	geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI * 1.2))
+geom.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI/3))
+	// 创建材质
+	var mat = new THREE.MeshPhongMaterial({
+		color: Colors.blue,
+		transparent: true,
+		opacity: 1,
+		shading: THREE.FlatShading
+	});
+
+	// 在three.js 中创建一个物体， 我们必须创建网格用来组合几何体和一些材质
+	this.mesh = new THREE.Mesh(geom, mat);
+
+	// 允许大海对象接受阴影
+	this.mesh.receiveShadow = true;
+}
+
+var box;
+
+function createBox() {
+	box = new Box();
+
+	// 在场景底部， 稍微推挤一下
+	box.mesh.position.z = 1400;
+	box.mesh.position.y =100;
+	box.mesh.position.z = -600;
+	box.mesh.scale.set(.30,.30,.30);
+	// 添加大海的网格至场景
+	scene.add(box.mesh);
+}
 
 /**
  * [init 初始化函数]
@@ -169,12 +203,15 @@ function init() {
 
 	createSea();
 
+	createBox();
+
 	loop();
 }
 
 
 function loop(){
 	sea.mesh.rotation.z += .005;
+	box.mesh.rotation.z += .015;
 	renderer.render(scene, camera);
 	requestAnimationFrame(loop);
 }
