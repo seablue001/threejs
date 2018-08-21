@@ -161,7 +161,7 @@ var Box = function() {
 
 	// 在 x 轴旋转几何体
 	geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI * 1.2))
-geom.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI/3))
+	geom.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI/3))
 	// 创建材质
 	var mat = new THREE.MeshPhongMaterial({
 		color: Colors.blue,
@@ -183,9 +183,9 @@ function createBox() {
 	box = new Box();
 
 	// 在场景底部， 稍微推挤一下
-	box.mesh.position.z = 1400;
-	box.mesh.position.y =100;
-	box.mesh.position.z = -600;
+	box.mesh.position.x = 0;
+	box.mesh.position.y =200;
+	box.mesh.position.z = -500;
 	box.mesh.scale.set(.30,.30,.30);
 	// 添加大海的网格至场景
 	scene.add(box.mesh);
