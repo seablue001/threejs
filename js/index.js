@@ -353,6 +353,13 @@ function handleMouseMove(event) {
    mousePos = {x:tx, y:ty};
 }
 
+function handleTouchMove(event) {
+    event.preventDefault();
+    var tx = -1 + (event.touches[0].pageX / WIDTH)*2;
+    var ty = 1 - (event.touches[0].pageY / HEIGHT)*2;
+    mousePos = {x:tx, y:ty};
+}
+
 
 
 /**
@@ -373,6 +380,7 @@ function init() {
 
 	//添加鼠标移动监听器
     document.addEventListener('mousemove', handleMouseMove, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
 
 	loop();
 }
