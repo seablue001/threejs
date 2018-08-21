@@ -155,41 +155,59 @@ function createSea() {
 	scene.add(sea.mesh);
 }
 
+/**
+ * [createSky 创建天空]
+ * @return {[type]} [description]
+ */
 
-var Box = function() {
-	var geom = new THREE.CylinderGeometry(600,600,800,40,10);
+var Cloud = function() {
+	// 创建一个天空的容器放置不同形状的云
+	this.mesh = new THREE.Object3D();
 
-	// 在 x 轴旋转几何体
-	geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI * 1.2))
-	geom.applyMatrix(new THREE.Matrix4().makeRotationY(-Math.PI/3))
-	// 创建材质
+	// 创建一个正方体
+   // 这个形状会被复制创建云
+   var geom = new THREE.BoxGeometry(20,20,20);
+
+	// 创建材质；一个简单的白色材质
 	var mat = new THREE.MeshPhongMaterial({
-		color: Colors.blue,
-		transparent: true,
-		opacity: 1,
-		shading: THREE.FlatShading
+		color: Colors.white
 	});
 
-	// 在three.js 中创建一个物体， 我们必须创建网格用来组合几何体和一些材质
-	this.mesh = new THREE.Mesh(geom, mat);
+	// 随机多次复制几何体 3~6个
+	var  nBlocs = 3 + Math.floor(Math.random()*3);
+	for(var i=0;i<nBlocs;i++) {
+		// 通过复制几何体创建网格
+		var m = new THREE.Mesh(geom, mat);
 
-	// 允许大海对象接受阴影
-	this.mesh.receiveShadow = true;
+		m.position.x = i*15;
+		m.position.y = Math.random()*10;
+		m.position.z = Math.random()*10;
+		m.rotation.z = Math.random()*Math.PI*2;
+		m.rotation.y = Math.random()*Math.PI*2;
+
+		// 随机设置正方形体的大小 0.1 ~ 1
+		var s = .1 + Math.random() * .9;
+		m.scale.set(s,s,s);
+
+		// 允许每个正方形体生成投影和接收投影
+		m.castShadow = true;
+		m.receiveShadow = true;
+
+		// 将正方形体添加至我们穿件的容器中
+		this.mesh.add(m);
+	}
 }
 
-var box;
 
-function createBox() {
-	box = new Box();
+var sky;
 
-	// 在场景底部， 稍微推挤一下
-	box.mesh.position.x = 0;
-	box.mesh.position.y =200;
-	box.mesh.position.z = -500;
-	box.mesh.scale.set(.30,.30,.30);
-	// 添加大海的网格至场景
-	scene.add(box.mesh);
+function createSky() {
+	sky = new Cloud();
+	sky.mesh.position.y = 130;
+	scene.add(sky.mesh);
 }
+
+
 
 /**
  * [init 初始化函数]
@@ -203,7 +221,7 @@ function init() {
 
 	createSea();
 
-	createBox();
+	createSky();
 
 	loop();
 }
@@ -211,7 +229,6 @@ function init() {
 
 function loop(){
 	sea.mesh.rotation.z += .005;
-	box.mesh.rotation.z += .015;
 	renderer.render(scene, camera);
 	requestAnimationFrame(loop);
 }
