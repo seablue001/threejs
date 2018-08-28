@@ -8,8 +8,6 @@ var Colors = {
 };
 
 
-
-
 /**
  * [createScene 创建场景]
  * @return {[type]} [description]
@@ -21,7 +19,6 @@ function createScene() {
 	HEIGHT = window.innerHeight;
 
 	scene = new THREE.Scene();
-
 	// 为场景添加雾的效果，颜色与css中设置的背景色一致
 	scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
 
